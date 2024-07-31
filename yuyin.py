@@ -30,11 +30,11 @@ if __name__ == '__main__':
     # r = redis.Redis(host='localhost', port=6379, db=0)
     # dy:message:hash:694742422766
     pool = redis.ConnectionPool(host="localhost", port=6379, db=0)
-    liveId = '694742422766'
+    # liveId = '819971037288'
     # liveId = sys[0]
 
     redisClient = getRedis()
-    pushKey = '%s:latest:%s'%(hashKey_prefix,liveId)
+    pushKey = '%s:latest:%s'%(hashKey_prefix,sys.argv[1])
 
     while True:
         try:

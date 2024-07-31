@@ -11,6 +11,8 @@ import pickle
 import re
 import datetime
 import json
+from selenium.common.exceptions import NoSuchElementException
+import sys
 
 def extract_chars(text):
     pattern = re.compile(r'[a-zA-Z0-9\u4e00-\u9fff]+')
@@ -24,6 +26,14 @@ os.chdir(abs_path)
 html = ''
 liveId = ''
 hashKey_prefix = 'dy:message:hash'
+
+def check_element_exists_by_xpath(driver,text):
+    try:
+        driver.find_element(By.XPATH, "//*[contains(text(), '"+text+"')]")
+        # driver.find_element_by_xpath(xpath)
+        return True
+    except NoSuchElementException:
+        return False
 
 def parse_latest(html):
     redisConn = getRedis()
@@ -128,6 +138,9 @@ def start(url):
     xpath = '//*[@id="chatroom"]/div/div[2]/div[1]/div/div[1]/div/div[1]/div/div[1]'
     # 底部消息
     xpath_bottom = '//*[@id="chatroom"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]'
+
+    xpath_continue = '/html/body/div[23]/div/div/div[2]/div[2]'
+    xpath_continue = '/html/body/div[20]/div/div/div[2]/div[2]'
     while True:
         try:
             html = driver.find_element(By.XPATH, xpath).get_attribute("innerHTML")
@@ -136,6 +149,14 @@ def start(url):
             html = driver.find_element(By.XPATH, xpath_bottom).get_attribute("innerHTML")
             # print(html)
             parse_latest(html)
+
+            if check_element_exists_by_xpath(driver,"继续播放"):
+                print("元素存在")
+                driver.find_element(By.XPATH, "//*[contains(text(), '播放')]").click()
+            else:
+                print("元素不存在")
+
+
             # break
         except BaseException as e:
             print(e)
@@ -155,7 +176,10 @@ if __name__ == '__main__':
     # r = redis.Redis(host='localhost', port=6379, db=0)
     # dy:message:hash:694742422766
     pool = redis.ConnectionPool(host="localhost", port=6379, db=0)
-    url = 'https://live.douyin.com/694742422766'
+    # url = 'https://live.douyin.com/694742422766'
+    # url = 'https://live.douyin.com/819971037288'
+    # url = 'https://live.douyin.com/149260322188'
+    url = 'https://live.douyin.com/'+sys.argv[1]
     numbers = re.findall(r"\d+", url)
     liveId = numbers[0]
     print("房间号:",liveId)
