@@ -4,7 +4,7 @@
 douyin.py 实时获取抖音直播间礼物和消息
 yuyin.py 实时播放直播间消息
 
-
+python start.py 抖音网页上的房间号
 
 
 
